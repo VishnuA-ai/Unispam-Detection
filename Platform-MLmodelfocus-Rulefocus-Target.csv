@@ -1,0 +1,5 @@
+"Platform","ML model focus","Rule focus","Target"
+"Email","phishing/spam text patterns, account takeover language linkedin","brand impersonation, verify account, suspension, login links","high precision on phishing"
+"SMS","spam/smishing classifier on SMS corpora github+1","OTP fraud, payment urgency, short-link risk, reward bait","95%+ realistic"
+"WhatsApp","conversational scam detection, offer/forward patterns arxiv","forwarded chain text, fake jobs, fake gifts, suspicious contact asks","harder, needs custom data"
+"Other","generic spam detector","generic suspicious keywords and links","fallback only"

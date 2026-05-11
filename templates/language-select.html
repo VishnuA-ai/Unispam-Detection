@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>UniSpam AI - Select Language</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
+  <style>
+    * { font-family: 'Satoshi', 'Inter', sans-serif; }
+    body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+    [data-theme="dark"] { color-scheme: dark; }
+    .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+  <div class="w-full max-w-md">
+    <!-- Logo & Branding -->
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-6 shadow-2xl">
+        <svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0-12a9 9 0 110 18 9 9 0 010-18z"></path>
+        </svg>
+      </div>
+      <h1 class="text-4xl font-bold text-white mb-2">UniSpam AI</h1>
+      <p class="text-white/80 text-lg">Global Spam Detection</p>
+    </div>
+
+    <!-- Language Selection Cards -->
+    <div class="space-y-4 mb-8">
+      <!-- English Option -->
+      <button onclick="selectLanguage('en')" class="w-full glass-effect rounded-2xl p-6 text-white hover:bg-white/20 transition-all transform hover:scale-105 active:scale-95">
+        <div class="flex items-center justify-between">
+          <div class="text-left">
+            <h2 class="text-2xl font-bold">English</h2>
+            <p class="text-white/70 text-sm mt-1">Continue in English</p>
+          </div>
+          <span class="text-3xl">🇬🇧</span>
+        </div>
+      </button>
+
+      <!-- Tamil Option -->
+      <button onclick="selectLanguage('ta')" class="w-full glass-effect rounded-2xl p-6 text-white hover:bg-white/20 transition-all transform hover:scale-105 active:scale-95">
+        <div class="flex items-center justify-between">
+          <div class="text-left">
+            <h2 class="text-2xl font-bold">தமிழ்</h2>
+            <p class="text-white/70 text-sm mt-1">தமிழில் தொடரவும்</p>
+          </div>
+          <span class="text-3xl">🇮🇳</span>
+        </div>
+      </button>
+    </div>
+
+    <!-- Features Preview -->
+    <div class="space-y-3 text-white/80 text-sm">
+      <div class="flex items-start gap-3">
+        <span class="text-xl">🔍</span>
+        <p>AI-powered spam detection across Email, SMS, WhatsApp</p>
+      </div>
+      <div class="flex items-start gap-3">
+        <span class="text-xl">📸</span>
+        <p>Scan screenshots with OCR for instant analysis</p>
+      </div>
+      <div class="flex items-start gap-3">
+        <span class="text-xl">🔗</span>
+        <p>Real-time dangerous link detection</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-12 text-center text-white/60 text-xs">
+      <p>100% Private • No Data Stored • Free to Use</p>
+    </div>
+  </div>
+
+  <script>
+    function selectLanguage(lang) {
+      // Store language in session storage
+      sessionStorage.setItem('language', lang);
+      localStorage.setItem('language', lang);
+      // Redirect to main app
+      window.location.href = `/index.html?lang=${lang}`;
+    }
+
+    // Check if user already has a language preference
+    window.addEventListener('load', () => {
+      const savedLang = localStorage.getItem('language');
+      if (savedLang && window.location.pathname === '/language-select.html') {
+        // Redirect to main app with saved language
+        window.location.href = `/index.html?lang=${savedLang}`;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>UniSpam AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
+  <style>
+    * { font-family: 'Satoshi', 'Inter', sans-serif; }
+    .risk-high { background: linear-gradient(135deg, #ff6b6b, #ee5a52); }
+    .risk-medium { background: linear-gradient(135deg, #ffa502, #ff6b9d); }
+    .risk-low { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+    .confidence-bar { transition: width 0.5s ease; }
+    .spinner { animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50" data-lang="en">
+  <div class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <div class="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0-12a9 9 0 110 18 9 9 0 010-18z"></path>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-gray-900">UniSpam AI</h1>
+          </div>
+        </div>
+        <button onclick="toggleLanguage()" class="px-3 py-2 bg-blue-100 text-blue-700 rounded-full font-semibold text-sm hover:bg-blue-200 transition">
+          <span id="langToggleText">🌐 EN</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 px-4 py-6 max-w-2xl mx-auto w-full">
+      <!-- Platform Selection -->
+      <div class="bg-white rounded-3xl p-6 shadow-lg mb-6">
+        <h2 id="selectPlatformLabel" class="text-xl font-bold text-gray-900 mb-4">Select Platform</h2>
+        <div class="grid grid-cols-2 gap-3">
+          <label class="cursor-pointer">
+            <input type="radio" name="platform" value="email" checked class="hidden peer">
+            <div class="p-4 rounded-2xl border-2 border-gray-200 peer-checked:border-blue-600 peer-checked:bg-blue-50 text-center font-semibold hover:border-blue-400 transition">
+              <span class="text-2xl">📧</span>
+              <p id="platformEmail" class="text-sm mt-2">Email</p>
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="platform" value="sms" class="hidden peer">
+            <div class="p-4 rounded-2xl border-2 border-gray-200 peer-checked:border-blue-600 peer-checked:bg-blue-50 text-center font-semibold hover:border-blue-400 transition">
+              <span class="text-2xl">💬</span>
+              <p id="platformSMS" class="text-sm mt-2">SMS</p>
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="platform" value="whatsapp" class="hidden peer">
+            <div class="p-4 rounded-2xl border-2 border-gray-200 peer-checked:border-blue-600 peer-checked:bg-blue-50 text-center font-semibold hover:border-blue-400 transition">
+              <span class="text-2xl">💚</span>
+              <p id="platformWhatsApp" class="text-sm mt-2">WhatsApp</p>
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="platform" value="other" class="hidden peer">
+            <div class="p-4 rounded-2xl border-2 border-gray-200 peer-checked:border-blue-600 peer-checked:bg-blue-50 text-center font-semibold hover:border-blue-400 transition">
+              <span class="text-2xl">📱</span>
+              <p id="platformOther" class="text-sm mt-2">Other</p>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Input Section -->
+      <div class="bg-white rounded-3xl p-6 shadow-lg mb-6">
+        <label id="messageLabel" class="block text-lg font-bold text-gray-900 mb-3">Message Content</label>
+        <textarea id="messageInput" placeholder="Paste your message here..." class="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-blue-600 focus:outline-none resize-none h-40 text-base"></textarea>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col gap-3 mt-6">
+          <button onclick="analyzMessage()" id="detectBtn" class="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl hover:bg-blue-700 transition active:scale-95 text-lg shadow-lg">
+            🔍 <span id="detectBtnText">Detect Spam</span>
+          </button>
+          <div class="flex gap-3">
+            <button onclick="loadSample()" id="sampleBtn" class="flex-1 bg-gray-100 text-gray-900 font-bold py-3 rounded-2xl hover:bg-gray-200 transition">
+              <span id="loadSampleText">📋 Load Sample</span>
+            </button>
+            <button onclick="clearForm()" id="clearBtn" class="flex-1 bg-red-100 text-red-700 font-bold py-3 rounded-2xl hover:bg-red-200 transition">
+              <span id="clearText">Clear</span>
+            </button>
+          </div>
+          <button onclick="triggerOCR()" id="ocrBtn" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 rounded-2xl hover:shadow-lg transition">
+            📷 <span id="scanScreenText">Scan Screenshot</span>
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden mt-6 flex items-center justify-center gap-3 text-blue-600">
+          <div class="w-5 h-5 border-3 border-blue-200 border-t-blue-600 rounded-full spinner"></div>
+          <span id="analyzingText">Analyzing message...</span>
+        </div>
+      </div>
+
+      <!-- Hidden File Input for OCR -->
+      <input type="file" id="ocrFileInput" class="hidden" accept="image/*" />
+
+      <!-- Results Section -->
+      <div id="resultsContainer" class="hidden">
+        <!-- Risk Level Card -->
+        <div id="riskCard" class="risk-high rounded-3xl p-8 text-white shadow-2xl mb-6">
+          <div class="text-center">
+            <p id="riskLevelLabel" class="text-sm font-semibold opacity-90 mb-2">Risk Level</p>
+            <p id="riskLevelText" class="text-4xl font-black mb-4">HIGH RISK</p>
+            <div class="w-full bg-white/30 rounded-full h-3 overflow-hidden">
+              <div id="confidenceBar" class="bg-white h-full w-0 confidence-bar"></div>
+            </div>
+            <p id="confidenceText" class="text-sm mt-3 font-semibold">0% Confidence</p>
+          </div>
+        </div>
+
+        <!-- Result Verdict -->
+        <div class="bg-white rounded-3xl p-6 shadow-lg mb-6">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <p id="resultLabelText" class="text-sm font-semibold text-gray-500 mb-1">Result</p>
+              <p id="resultVerdict" class="text-4xl font-black text-red-600">SPAM</p>
+            </div>
+            <div class="text-right">
+              <p id="platformLabelText" class="text-sm font-semibold text-gray-500 mb-1">Platform</p>
+              <p id="platformResult" class="text-2xl font-bold text-gray-900">Email</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ML & Rule Scores -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="bg-white rounded-2xl p-6 shadow-lg">
+            <p id="mlProbLabel" class="text-xs font-semibold text-gray-500 mb-2">ML Probability</p>
+            <p id="mlProb" class="text-3xl font-bold text-blue-600">0%</p>
+          </div>
+          <div class="bg-white rounded-2xl p-6 shadow-lg">
+            <p id="ruleScoreLabel" class="text-xs font-semibold text-gray-500 mb-2">Rule Score</p>
+            <p id="ruleScore" class="text-3xl font-bold text-orange-600">0%</p>
+          </div>
+        </div>
+
+        <!-- Reasons -->
+        <div class="bg-white rounded-3xl p-6 shadow-lg mb-6">
+          <h3 id="reasonsTitle" class="text-xl font-bold text-gray-900 mb-4">Why This Is Flagged</h3>
+          <ul id="reasonsList" class="space-y-2">
+            <li class="flex items-start gap-3">
+              <span class="text-red-500 font-bold mt-1">⚠️</span>
+              <span class="text-gray-700">Sample reason</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Platform Insight -->
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-6 border-2 border-blue-200 shadow-lg mb-6">
+          <h3 id="insightTitle" class="text-lg font-bold text-gray-900 mb-3">Platform Insight</h3>
+          <p id="platformInsight" class="text-gray-700 leading-relaxed"></p>
+        </div>
+
+        <!-- Highlighted Text -->
+        <div class="bg-white rounded-3xl p-6 shadow-lg mb-6">
+          <h3 id="highlightedTitle" class="text-lg font-bold text-gray-900 mb-4">Suspicious Content</h3>
+          <div id="highlightedText" class="bg-yellow-50 p-4 rounded-2xl border-l-4 border-yellow-400 text-gray-800 leading-relaxed text-sm"></div>
+        </div>
+
+        <!-- Feedback Button -->
+        <div class="text-center mb-8">
+          <button onclick="sendFeedback()" class="px-6 py-3 bg-gray-200 text-gray-800 font-semibold rounded-full hover:bg-gray-300 transition">
+            <span id="feedbackText">❌ This is incorrect</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="bg-white rounded-3xl p-12 shadow-lg text-center">
+        <div class="text-6xl mb-4">📨</div>
+        <h3 id="noResultTitle" class="text-2xl font-bold text-gray-900 mb-2">No Result Yet</h3>
+        <p id="noResultText" class="text-gray-600">Submit a message to view spam detection results.</p>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 text-gray-500 text-sm">
+      <p>🔒 Private • 🆓 Free • ⚡ Instant</p>
+    </footer>
+  </div>
+
+  <script>
+    let translations = {};
+    let currentLanguage = 'en';
+
+    // Load translations
+    async function loadTranslations() {
+      try {
+        const response = await fetch('/translations');
+        translations = await response.json();
+        
+        // Get language from URL or localStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        currentLanguage = urlParams.get('lang') || localStorage.getItem('language') || 'en';
+        
+        document.documentElement.lang = currentLanguage === 'ta' ? 'ta' : 'en';
+        document.body.dataset.lang = currentLanguage;
+        
+        applyTranslations();
+      } catch (e) {
+        console.error('Failed to load translations:', e);
+      }
+    }
+
+    function applyTranslations() {
+      const t = translations[currentLanguage] || translations['en'];
+      
+      // Update all elements
+      document.getElementById('selectPlatformLabel').textContent = t.select_platform;
+      document.getElementById('platformEmail').textContent = t.email;
+      document.getElementById('platformSMS').textContent = t.sms;
+      document.getElementById('platformWhatsApp').textContent = t.whatsapp;
+      document.getElementById('platformOther').textContent = t.other;
+      document.getElementById('messageLabel').textContent = t.message_placeholder;
+      document.getElementById('messageInput').placeholder = t.message_placeholder;
+      document.getElementById('detectBtnText').textContent = t.detect_spam;
+      document.getElementById('loadSampleText').textContent = '📋 ' + t.load_sample_btn;
+      document.getElementById('clearText').textContent = t.clear;
+      document.getElementById('scanScreenText').textContent = t.scan_screenshot;
+      document.getElementById('analyzingText').textContent = t.analyzing;
+      document.getElementById('riskLevelLabel').textContent = t.risk_level;
+      document.getElementById('resultLabelText').textContent = t.result;
+      document.getElementById('platformLabelText').textContent = t.select_platform;
+      document.getElementById('mlProbLabel').textContent = t.ml_probability;
+      document.getElementById('ruleScoreLabel').textContent = t.rule_score;
+      document.getElementById('reasonsTitle').textContent = t.reasons;
+      document.getElementById('insightTitle').textContent = t.platform_insight;
+      document.getElementById('highlightedTitle').textContent = t.highlighted_text;
+      document.getElementById('feedbackText').textContent = '❌ ' + t.feedback;
+      document.getElementById('noResultTitle').textContent = t.no_result_yet;
+      document.getElementById('noResultText').textContent = t.submit_message;
+      document.getElementById('langToggleText').textContent = currentLanguage === 'en' ? '🌐 EN' : '🌐 TA';
+    }
+
+    function toggleLanguage() {
+      currentLanguage = currentLanguage === 'en' ? 'ta' : 'en';
+      localStorage.setItem('language', currentLanguage);
+      window.location.href = `?lang=${currentLanguage}`;
+    }
+
+    async function analyzMessage() {
+      const message = document.getElementById('messageInput').value.trim();
+      const platform = document.querySelector('input[name="platform"]:checked').value;
+      
+      if (!message || message.length < 3) {
+        alert(translations[currentLanguage]?.error_message || 'Please enter a valid message');
+        return;
+      }
+
+      document.getElementById('loadingState').classList.remove('hidden');
+      document.getElementById('detectBtn').disabled = true;
+
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `platform=${encodeURIComponent(platform)}&message=${encodeURIComponent(message)}&language=${currentLanguage}`
+        });
+
+        if (!response.ok) throw new Error('API Error');
+        const data = await response.json();
+
+        displayResults(data);
+      } catch (error) {
+        alert(translations[currentLanguage]?.api_error || 'Service error');
+      } finally {
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('detectBtn').disabled = false;
+      }
+    }
+
+    function displayResults(data) {
+      document.getElementById('emptyState').classList.add('hidden');
+      document.getElementById('resultsContainer').classList.remove('hidden');
+
+      const t = translations[currentLanguage] || translations['en'];
+
+      // Risk level
+      const confidence = data.confidence;
+      let riskClass = 'risk-high';
+      let riskText = t.high_risk;
+      if (confidence < 30) {
+        riskClass = 'risk-low';
+        riskText = t.low_risk;
+      } else if (confidence < 70) {
+        riskClass = 'risk-medium';
+        riskText = t.medium_risk;
+      }
+
+      document.getElementById('riskCard').className = `${riskClass} rounded-3xl p-8 text-white shadow-2xl mb-6`;
+      document.getElementById('riskLevelText').textContent = riskText;
+      document.getElementById('confidenceBar').style.width = `${confidence}%`;
+      document.getElementById('confidenceText').textContent = `${confidence}% ${t.confidence}`;
+
+      // Result
+      const resultText = data.result === 'Spam' ? t.spam : t.not_spam;
+      document.getElementById('resultVerdict').textContent = resultText;
+      document.getElementById('resultVerdict').className = data.result === 'Spam' ? 'text-4xl font-black text-red-600' : 'text-4xl font-black text-green-600';
+      document.getElementById('platformResult').textContent = data.platform.toUpperCase();
+
+      // Scores
+      document.getElementById('mlProb').textContent = `${data.ml_probability}%`;
+      document.getElementById('ruleScore').textContent = `${data.rule_score}%`;
+
+      // Reasons
+      const reasonsList = document.getElementById('reasonsList');
+      reasonsList.innerHTML = data.reasons.map(r => `
+        <li class="flex items-start gap-3">
+          <span class="text-red-500 font-bold mt-1">⚠️</span>
+          <span class="text-gray-700">${r}</span>
+        </li>
+      `).join('');
+
+      // Platform insight
+      document.getElementById('platformInsight').textContent = data.platform_insight;
+
+      // Highlighted text
+      document.getElementById('highlightedText').innerHTML = data.highlighted_text;
+
+      // Scroll to results
+      setTimeout(() => document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth' }), 100);
+    }
+
+    function loadSample() {
+      const t = translations[currentLanguage] || translations['en'];
+      const samples = [
+        { platform: 'email', message: t.sample_message_1 },
+        { platform: 'sms', message: t.sample_message_2 },
+        { platform: 'whatsapp', message: t.sample_message_3 }
+      ];
+      const sample = samples[Math.floor(Math.random() * samples.length)];
+      document.querySelector(`input[name="platform"][value="${sample.platform}"]`).checked = true;
+      document.getElementById('messageInput').value = sample.message;
+    }
+
+    function clearForm() {
+      document.getElementById('messageInput').value = '';
+      document.getElementById('emptyState').classList.remove('hidden');
+      document.getElementById('resultsContainer').classList.add('hidden');
+      document.querySelector('input[name="platform"][value="email"]').checked = true;
+    }
+
+    function triggerOCR() {
+      document.getElementById('ocrFileInput').click();
+    }
+
+    document.getElementById('ocrFileInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      document.getElementById('loadingState').classList.remove('hidden');
+      document.getElementById('detectBtn').disabled = true;
+
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('language', currentLanguage);
+
+      try {
+        const response = await fetch('/ocr-scan', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) throw new Error('OCR Error');
+        const data = await response.json();
+
+        document.getElementById('messageInput').value = data.extracted_text;
+        const platform = document.querySelector('input[name="platform"]:checked').value;
+        
+        setTimeout(() => analyzMessage(), 200);
+      } catch (error) {
+        alert('Screenshot scanning failed. Please try again.');
+      } finally {
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('detectBtn').disabled = false;
+      }
+    });
+
+    function sendFeedback() {
+      const t = translations[currentLanguage] || translations['en'];
+      alert(t.feedback_captured || 'Feedback captured!');
+    }
+
+    // Load on start
+    loadTranslations();
+  </script>
+</body>
+</html>

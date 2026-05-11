@@ -1,0 +1,34 @@
+hi i have loaded the datasets for all 
+email sms whstapp and genral 
+
+make sure totrain that and i need perfect accuracy and i have attached the image that contains tips to get 98 % accuracy okay so make sure to train that all and make surei need perfect output and make your tokens wisley because i nee dyou for next steps
+now there having all datasets take ad train if code need to chnage based on that means chnage that and give the better result good performance and i will give as product make the ui and ux also very smooth and eye friendly and mobile friendly also okay 
+
+and there will be option that have mobile view or desktop view 
+okay make a goodproduct 
+
+and datasets real having use that  train and give 
+
+WORK BY YOU
+
+Reviewing app.py for any remaining model variable issues and correcting them.
+
+Read app.py
+
+Fixing the app probability lookup and restoring clean preprocessing in the project.
+
+Compacted conversation
+
+Fix Applied
+Updated app.py
+
+Replaced the stale model.classes_ reference with pipeline.classes_
+This ensures hybrid_predict() uses the loaded pipeline correctly for spam probability lookup
+Verified preprocess.py
+
+The preprocessing file is intact and contains a valid normalize_text() implementation
+Result
+app.py now uses the loaded model pipeline consistently
+Prediction probability extraction should work without the previous undefined model error
+You've used 51% of your session rate limit. Your session rate limit will reset on May 6 at 2:15 PM. Learn More
+
